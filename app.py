@@ -45,5 +45,10 @@ def get_json_post_id(post_id):
     return jsonify(post_id)
 
 
+@app.route("/bookmarks/")
+def get_bookmarks():
+    return render_template("bookmarks.html")
+
+
 if __name__ == '__main__':
     app.run(debug=True)
