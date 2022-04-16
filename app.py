@@ -1,22 +1,30 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 from utils import DataComments
 
 app = Flask(__name__)
 
-data = DataComments("./data/data.json", "./data/comments.json")
+data = DataComments("./data/data.json", "./data/comments.json", "./data/bookmarks.json")
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", all_post=data.get_posts_all())
+    return render_template("index.html", all_post=data.get_posts_all(), len_bookmark=data.len_bookmarks())
 
 
-@app.route("/posts/<int:postid>")
+@app.route("/posts/<int:postid>", methods=["GET", "POST"])
 def post(postid):
     post_id = data.get_post_by_pk(postid)
-    comments_id = data.get_comments_by_post_id(postid)
-    comments_all = len(comments_id)
-    return render_template("post.html", post_id=post_id, comments_id=comments_id, comments_all=comments_all)
+    if request.method == "GET":
+        comments_id = data.get_comments_by_post_id(postid)
+        comments_all = len(comments_id)
+        return render_template("post.html", post_id=post_id, comments_id=comments_id, comments_all=comments_all)
+    else:
+        name = request.form["name"]
+        comment = request.form["comment"]
+        data.add_comments(postid, name, comment)
+        comments_id = data.get_comments_by_post_id(postid)
+        comments_all = len(comments_id)
+        return render_template("post.html", post_id=post_id, comments_id=comments_id, comments_all=comments_all)
 
 
 @app.route("/search/")
@@ -47,7 +55,24 @@ def get_json_post_id(post_id):
 
 @app.route("/bookmarks/")
 def get_bookmarks():
-    return render_template("bookmarks.html")
+    return render_template("bookmarks.html", all_bookmarks=data.all_bookmarks())
+
+
+@app.route("/tag/<tagname>")
+def get_tag(tagname):
+    pass
+
+
+@app.route("/bookmarks/add/<int:postid>/")
+def get_post_id_add(postid):
+    data.get_add_bookmarks_post_id(postid)
+    return redirect("/", code=302)
+
+
+@app.route("/bookmarks/remove/<int:postid>/")
+def get_post_id_remove(postid):
+    data.del_bookmarks(postid)
+    return redirect("/bookmarks/", code=302)
 
 
 if __name__ == '__main__':

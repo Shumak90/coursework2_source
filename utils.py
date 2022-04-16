@@ -2,9 +2,10 @@ import json
 
 
 class DataComments:
-    def __init__(self, path_data, path_comments):
+    def __init__(self, path_data, path_comments, path_book):
         self.path_data = path_data
         self.path_comments = path_comments
+        self.path_book = path_book
 
     def get_posts_all(self):
         """возвращает посты"""
@@ -47,3 +48,52 @@ class DataComments:
             if pk == data["pk"]:
                 return data
 
+    def get_add_bookmarks_post_id(self, post_id):
+        """добавление в закладки"""
+        with open(self.path_book, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        data.append(self.get_post_by_pk(post_id))
+        x = []
+        for i in data:
+            if i not in x:
+                x.append(i)
+        data = x
+        with open(self.path_book, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=2, ensure_ascii=False)
+
+    def del_bookmarks(self, post_id):
+        """удаление закладок"""
+        with open(self.path_book, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        x = []
+        for i in data:
+            if i not in [self.get_post_by_pk(post_id)]:
+                x.append(i)
+        data = x
+        with open(self.path_book, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=2, ensure_ascii=False)
+
+    def all_bookmarks(self):
+        """возвращает закладки"""
+        with open(self.path_book, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        return data
+
+    def len_bookmarks(self):
+        data = self.all_bookmarks()
+        return len(data)
+
+    def add_comments(self, post_id, name, comment):
+        """добавить комментарий"""
+        with open(self.path_comments, "r", encoding="utf-8") as file:
+            comments_all = json.load(file)
+        pk = len(comments_all)
+        comments = {"post_id": post_id, "commenter_name": name, "comment": comment, "pk": pk+1}
+        for comment in comments_all:
+            if pk == comment["pk"]:
+                comments_all.append(comments)
+        with open(self.path_comments, "w", encoding="utf-8") as file:
+            json.dump(comments_all, file, indent=2, ensure_ascii=False)
+
+
+# p = DataComments("data/data.json", "data/comments.json", "data/bookmarks.json")

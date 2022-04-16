@@ -34,9 +34,7 @@
             </div>
             <span class="item__username">{{ post_id.poster_name }}</span>
           </a>
-          <button type="button" class="item__bookmark-btn">
-            <img src="../static/img/bookmark.png" alt="" class="item__bookmark-icon" width="24">
-          </button>
+
         </div>
         <a href="" class="item__post-link">
           <img src={{ post_id.pic }} alt="" width="348" class="item__post-img">
@@ -60,7 +58,15 @@
               <b>{{ comment.commenter_name }}</b> {{ comment.comment }}
             </p>
             {% endfor %}
-
+          <form method="post">
+              <p><b>Ваше имя:</b><br>
+               <input name="name" type="text" size="15">
+              </p>
+              <p>Комментарий<Br>
+                <textarea name="comment" cols="40" rows="3"></textarea></p>
+              <p><input type="submit" value="Отправить">
+              <input type="reset" value="Очистить"></p>
+          </form>
           </div>
         </div>
       </div>
